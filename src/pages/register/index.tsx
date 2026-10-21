@@ -5,6 +5,9 @@ import { Input } from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { auth } from "../../services/firebaseConnection";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router";
 
 const schema = z.object({
   name: z.string().nonempty("O preenchimento do campo nome é obrigatório!"),
@@ -21,6 +24,7 @@ const schema = z.object({
 type FormaData = z.infer<typeof schema>;
 
 export function Register() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -31,7 +35,18 @@ export function Register() {
   });
 
   function onSubmit(data: FormaData) {
-    console.log(data);
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then(async (user) => {
+        await updateProfile(user.user, {
+          displayName: data.name,
+        });
+        console.log("USUÁRIO CADASTRADO COM SUCESSO!!!");
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((error) => {
+        console.log("ERRO AO CADASTRAR ESTE USUÁRIO!!!");
+        console.log(error.message);
+      });
   }
 
   return (
@@ -76,7 +91,7 @@ export function Register() {
             type="submit"
             className="bg-zinc-900 w-full rounded-md text-white h-10 font-medium cursor-pointer"
           >
-            Acessar
+            Cadastrar
           </button>
         </form>
         <Link to="/login">Já possui uma conta? Faça login!</Link>
