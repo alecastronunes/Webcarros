@@ -1,4 +1,5 @@
 import logoImg from "../../assets/logo.svg";
+import { useEffect } from "react";
 import { Container } from "../../components/container";
 import { Link } from "react-router";
 import { Input } from "../../components/input";
@@ -6,7 +7,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { auth } from "../../services/firebaseConnection";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut,
+} from "firebase/auth";
 import { useNavigate } from "react-router";
 
 const schema = z.object({
@@ -33,6 +38,13 @@ export function Register() {
     resolver: zodResolver(schema),
     mode: "onChange",
   });
+
+  useEffect(() => {
+    async function handleLogout() {
+      await signOut(auth);
+    }
+    handleLogout();
+  }, []);
 
   function onSubmit(data: FormaData) {
     createUserWithEmailAndPassword(auth, data.email, data.password)
