@@ -31,7 +31,7 @@ const schema = z.object({
 type FormaData = z.infer<typeof schema>;
 
 export function Register() {
-  const { handleInfoUser, user } = useContext(AuthContext);
+  const { handleInfoUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
     register,
